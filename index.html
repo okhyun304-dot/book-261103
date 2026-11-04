@@ -306,6 +306,45 @@ body{
 .chapter .talk b{display:inline-block;width:5.2em;text-indent:0;color:var(--muted);font-weight:600;font-size:.9em}
 .chapter .talk p.boss b{color:var(--accent)}
 .chapter p a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;word-break:break-all}
+
+#stBtn{font-weight:700;font-size:.82rem;width:auto;padding:0 .7rem}
+#study{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;flex-direction:column}
+#study.on{display:flex}
+#study .sh{display:flex;align-items:center;gap:.5rem;padding:.55rem .8rem;border-bottom:1px solid var(--line);background:var(--surface)}
+#study .sh b{flex:1;font-size:1rem}
+#study .tabs{display:flex;border-bottom:1px solid var(--line);background:var(--surface);overflow-x:auto}
+#study .tabs button{flex:1 0 auto;border:0;background:none;color:var(--muted);font:inherit;font-size:.9rem;padding:.7rem .9rem;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+#study .tabs button.cur{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+#study .pane{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 4rem}
+#study .in{max-width:760px;margin:0 auto;padding:0 1rem}
+#study h4{font-size:.78rem;letter-spacing:.16em;color:var(--accent);margin:1.6rem 0 .7rem;font-weight:700}
+#study .vg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#study .vi{cursor:pointer}
+#study .vi img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#000}
+#study .vi .t{font-size:.84rem;line-height:1.45;margin-top:.4rem;color:var(--ink)}
+#study .vi .c{font-size:.74rem;color:var(--muted);margin-top:.15rem}
+#study .dg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#study .dg img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;cursor:pointer;background:#fff}
+#study .row{display:flex;gap:.8rem;align-items:flex-start;padding:.85rem 0;border-bottom:1px solid var(--line);cursor:pointer}
+#study .row.on .pl{background:var(--ink);color:var(--bg)}
+#study .pl{flex:none;width:36px;height:36px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-size:.8rem}
+#study .row .t{font-size:.9rem;line-height:1.55}
+#study .row .c{font-size:.74rem;color:var(--muted);margin-top:.2rem}
+#study .q{padding:1.1rem 0;border-bottom:1px solid var(--line);cursor:pointer}
+#study .q .t{font-size:1.05rem;line-height:1.65;font-weight:600}
+#study .q .c{font-size:.74rem;color:var(--muted);margin-top:.35rem}
+#study .bar{display:flex;gap:.6rem;align-items:center;margin:1rem 0 .2rem}
+#study .bar button{border:1px solid var(--ink);background:none;color:var(--ink);font:inherit;font-size:.85rem;padding:.45rem .9rem;cursor:pointer}
+#study .bar span{font-size:.8rem;color:var(--muted)}
+#lbx{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.92);display:none;flex-direction:column;justify-content:center}
+#lbx.on{display:flex}
+#lbx .box{width:100%;max-width:1100px;margin:0 auto;padding:0 .6rem}
+#lbx img,#lbx video{width:100%;max-height:72vh;object-fit:contain;display:block;background:#fff}
+#lbx video{background:#000}
+#lbx .cap{color:#ddd;font-size:.85rem;line-height:1.55;margin:.7rem .2rem 0}
+#lbx .nav{display:flex;gap:.5rem;justify-content:space-between;margin:.8rem .2rem 0}
+#lbx .nav button{border:1px solid #888;background:none;color:#eee;font:inherit;font-size:.85rem;padding:.5rem .9rem;cursor:pointer}
+#lbx .x{position:absolute;top:.6rem;right:.8rem;border:0;background:none;color:#fff;font-size:1.6rem;cursor:pointer}
 </style>
 </head>
 <body>
@@ -314,6 +353,7 @@ body{
   <button class="iconbtn" id="menuBtn" aria-label="목차">☰</button>
   <span class="tb-title">마음은 늦게 도착한다</span>
   <span class="spacer"></span>
+  <button class="iconbtn" id="stBtn" aria-label="모아보기">모아보기</button>
   <button class="iconbtn" id="searchBtn" aria-label="검색">🔍</button>
   <button class="iconbtn sm" id="fsDown" aria-label="글자 작게">A−</button>
   <button class="iconbtn sm" id="fsUp" aria-label="글자 크게">A+</button>
@@ -707,6 +747,12 @@ body{
 </main>
 <button class="iconbtn" id="toTop" aria-label="차례로">☰</button>
 <div id="resumeBar"><span class="rb-go">이어읽기</span><span class="rb-x" aria-label="닫기">✕</span></div>
+
+<div id="study"><div class="sh"><b>모아보기</b><button class="iconbtn sm" id="stClose" aria-label="닫기">✕</button></div>
+<div class="tabs" id="stTabs"><button data-t="v" class="cur">🎬 영상</button><button data-t="d">✏️ 도해</button><button data-t="a">🎧 현장 음성</button><button data-t="q">💬 핵심 문장</button></div>
+<div class="pane" id="stPane"></div></div>
+<div id="lbx"><button class="x" id="lbX" aria-label="닫기">✕</button><div class="box" id="lbBox"></div></div>
+
 <script>
 const root=document.documentElement;
 const saved=localStorage.getItem('theme');
@@ -932,6 +978,67 @@ document.querySelectorAll('.chapter').forEach(ch=>{
   };});
   ov.querySelector('.pdf-cancel').onclick=close;
   ov.addEventListener('click',function(e){ if(e.target===ov && !ov.classList.contains('busy')) close(); });
+})();
+</script>
+<script>
+(function(){
+const $ = id => document.getElementById(id), esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const chOf = el => { const a = el.closest("article.chapter"); return a ? {id: a.id, n: (a.querySelector(".cnum") || {}).textContent || "", t: (a.querySelector("h3") || {}).textContent || ""} : {id: "prologue", n: "", t: "여는 글"}; };
+const lab = c => (c.n ? c.n + ". " : "") + c.t;
+const vids = [...document.querySelectorAll("figure.vid")].map(f => { const v = f.querySelector("video"), src = v.getAttribute("src"), b = src.split("/").pop();
+  return {el: f, src, poster: v.getAttribute("poster") || "", cap: (f.querySelector("figcaption") || {}).textContent || "", ch: chOf(f),
+          kind: b.startsWith("P_") ? "판서" : b.startsWith("H_") ? "해설" : "현장"}; });
+const dgms = [...document.querySelectorAll("figure.dgm img")].map(i => ({el: i.closest("figure"), src: i.getAttribute("src"), ch: chOf(i)}));
+const voices = [...document.querySelectorAll(".voice")].map(v => ({el: v, src: v.dataset.src, cap: (v.querySelector(".vcap") || {}).textContent || "", ch: chOf(v)}));
+const quotes = [...document.querySelectorAll(".pull")].map(q => ({el: q, t: q.textContent, ch: chOf(q)}));
+let tab = "v", au = new Audio(), ai = -1, chain = false; au.preload = "none";
+function goTo(el){ close(); lbClose(); el.scrollIntoView({block: "center", behavior: "instant"}); setTimeout(() => el.scrollIntoView({block: "center", behavior: "instant"}), 60); }
+function open(t){ document.querySelectorAll("video").forEach(x => x.pause()); $("study").classList.add("on"); document.body.style.overflow = "hidden"; show(t || tab); }
+function close(){ $("study").classList.remove("on"); document.body.style.overflow = ""; }
+function show(t){
+  tab = t; [...$("stTabs").children].forEach(b => b.classList.toggle("cur", b.dataset.t === t)); let h = '<div class="in">';
+  if (t === "v") {
+    [["판서", "판서 — 도해가 그려지며 설명 · 대장님 목소리 AI 낭독"], ["해설", "해설 — 대장님 목소리 AI 낭독"], ["현장", "현장 — 그날 사진 + 실제 녹음"]].forEach(([k, name]) => {
+      const L = vids.map((v, i) => [v, i]).filter(([v]) => v.kind === k); if (!L.length) return;
+      h += "<h4>" + name + " (" + L.length + ")</h4><div class='vg'>" + L.map(([v, i]) => '<div class="vi" data-v="' + i + '">' + (v.poster ? '<img loading="lazy" src="' + esc(v.poster) + '" alt="">' : "") +
+        '<div class="t">' + esc(k === "판서" ? v.ch.t : (v.cap.replace(/^해설,\s*/, "").replace(/\s*[·(]\s*대장님 목소리.*$/, "") || v.ch.t)) + '</div><div class="c">' + esc(v.ch.n ? v.ch.n + "번 꼭지" : "") + "</div></div>").join("") + "</div>"; });
+  } else if (t === "d") {
+    h += "<h4>도해 " + dgms.length + "장 — 누르면 크게, 좌우로 넘기기</h4><div class='dg'>" + dgms.map((d, i) => '<img loading="lazy" data-d="' + i + '" src="' + d.src + '" alt="">').join("") + "</div>";
+  } else if (t === "a") {
+    h += '<div class="bar"><button id="stAll">▶ 처음부터 이어 듣기</button><span>' + voices.length + "개 · 대장님 실제 목소리</span></div>" +
+      voices.map((v, i) => '<div class="row' + (i === ai && !au.paused ? " on" : "") + '" data-a="' + i + '"><div class="pl">' + (i === ai && !au.paused ? "❚❚" : "▶") + '</div><div><div class="t">' + esc(v.cap) + '</div><div class="c">' + esc(lab(v.ch)) + "</div></div></div>").join("");
+  } else {
+    h += "<h4>핵심 문장 " + quotes.length + " — 누르면 본문 그 자리로</h4>" + quotes.map((q, i) => '<div class="q" data-q="' + i + '"><div class="t">' + esc(q.t) + '</div><div class="c">' + esc(lab(q.ch)) + "</div></div>").join("");
+  }
+  $("stPane").innerHTML = h + "</div>";
+  const all = $("stAll"); if (all) all.onclick = () => { chain = true; play(0); };
+}
+function play(i){ if (i < 0 || i >= voices.length) { chain = false; show("a"); return; }
+  if (ai === i && !au.paused) { au.pause(); chain = false; show("a"); return; }
+  document.querySelectorAll("video").forEach(x => x.pause()); ai = i; au.src = voices[i].src; au.play(); show("a");
+  if ("mediaSession" in navigator) navigator.mediaSession.metadata = new MediaMetadata({title: voices[i].cap, artist: document.title}); }
+au.addEventListener("ended", () => { if (chain) play(ai + 1); else show("a"); });
+au.addEventListener("pause", () => { if (tab === "a" && $("study").classList.contains("on")) show("a"); });
+let li = -1, lk = "";
+function lb(kind, i){ lk = kind; li = i; const box = $("lbBox");
+  if (kind === "d") { const d = dgms[i]; box.innerHTML = '<img src="' + d.src + '" alt=""><div class="cap">' + (i + 1) + " / " + dgms.length + " · " + esc(lab(d.ch)) + '</div><div class="nav"><button id="lbP">← 이전</button><button id="lbG">본문에서 보기</button><button id="lbN">다음 →</button></div>'; }
+  else { const v = vids[i]; box.innerHTML = '<video src="' + esc(v.src) + '" controls autoplay playsinline' + (v.poster ? ' poster="' + esc(v.poster) + '"' : "") + '></video><div class="cap">' + esc(v.kind + " · " + (v.cap || "")) + "<br>" + esc(lab(v.ch)) + '</div><div class="nav"><button id="lbP">← 이전</button><button id="lbG">본문에서 보기</button><button id="lbN">다음 →</button></div>'; au.pause(); }
+  $("lbx").classList.add("on");
+  const n = kind === "d" ? dgms.length : vids.length;
+  $("lbP").onclick = () => lb(kind, (i - 1 + n) % n); $("lbN").onclick = () => lb(kind, (i + 1) % n);
+  $("lbG").onclick = () => goTo((kind === "d" ? dgms : vids)[i].el); }
+function lbClose(){ $("lbx").classList.remove("on"); $("lbBox").innerHTML = ""; }
+$("lbX").onclick = lbClose;
+let sx = null; $("lbx").addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, {passive: true});
+$("lbx").addEventListener("touchend", e => { if (sx == null || lk !== "d") return; const dx = e.changedTouches[0].clientX - sx; sx = null;
+  if (Math.abs(dx) > 50) lb("d", (li + (dx < 0 ? 1 : -1) + dgms.length) % dgms.length); });
+document.addEventListener("keydown", e => { if (!$("lbx").classList.contains("on")) return; if (e.key === "Escape") lbClose();
+  if (lk === "d" && e.key === "ArrowRight") lb("d", (li + 1) % dgms.length); if (lk === "d" && e.key === "ArrowLeft") lb("d", (li - 1 + dgms.length) % dgms.length); });
+$("stPane").addEventListener("click", e => { const v = e.target.closest("[data-v]"), d = e.target.closest("[data-d]"), a = e.target.closest("[data-a]"), q = e.target.closest("[data-q]");
+  if (v) lb("v", +v.dataset.v); else if (d) lb("d", +d.dataset.d); else if (a) { chain = false; play(+a.dataset.a); } else if (q) goTo(quotes[+q.dataset.q].el); });
+$("stTabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) show(b.dataset.t); });
+$("stBtn").onclick = () => open(); $("stClose").onclick = close;
+const dl = document.querySelector(".dtools"); if (dl) { const b = document.createElement("button"); b.className = "dtool"; b.textContent = "▦ 모아보기 (영상·도해·음성·핵심 문장)"; b.onclick = () => { document.getElementById("closeBtn").click(); open(); }; dl.prepend(b); }
 })();
 </script>
 <script>
